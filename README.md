@@ -3,7 +3,7 @@
 ## Overview
 This p1 assignment is a warm up to concepts in C programming such as pointers, structs, typedef, memory management, makefiles, etc. These concepts are implemented by developing a circular doubly linked list with a sentinel node. The main goal is for students to familarize themselves with concepts in C programming as well as how to run and test code in C.
 
-Steps to configure, build, run, and test the project.
+**Steps to configure, build, run, and test the project:**
 
 ## Building
 
