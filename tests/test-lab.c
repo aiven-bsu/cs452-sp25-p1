@@ -242,6 +242,101 @@ void test_notInList(void)
   free(data);
 }
 
+/** Additional Test */
+
+// Test list size
+void test_list_size(void) {
+  populate_list();
+  TEST_ASSERT_EQUAL_INT(5, lst_->size);
+
+  // Remove elements at index 0 and 3 and check size
+  int *rval = (int *)list_remove_index(lst_, 0);
+  TEST_ASSERT_EQUAL_INT(4, lst_->size);
+  free(rval);
+  rval = (int *)list_remove_index(lst_, 3);
+  TEST_ASSERT_EQUAL_INT(3, lst_->size);
+  free(rval);
+
+  // Add elements and check size
+  list_add(lst_, alloc_data(5));
+  TEST_ASSERT_EQUAL_INT(4, lst_->size);
+  list_add(lst_, alloc_data(6));
+  TEST_ASSERT_EQUAL_INT(5, lst_->size);
+
+  // Destroy list
+  list_destroy(&lst_);
+}
+
+// Test empty list
+void test_empty_list(void) {
+  list_t *lst = NULL;
+  lst = list_init(destroy_data, compare_to);
+  TEST_ASSERT_EQUAL_INT(0, lst->size);
+  list_destroy(&lst);
+  TEST_ASSERT_NULL(lst);
+}
+
+// Test next pointer
+void test_next_data(void) {
+  // Initialize list and populate
+  populate_list();
+
+  // validate next pointer and data
+  node_t *curr = lst_->head->next;
+  for (int i = 4; i >= 0; i--) {
+    TEST_ASSERT_NOT_NULL(curr);
+    TEST_ASSERT_TRUE(*((int *)curr->data) == i);
+    curr = curr->next;
+  }
+
+  // Destroy list
+  list_destroy(&lst_);
+  TEST_ASSERT_NULL(lst_);
+}
+
+void test_prev_data(void) {
+  // Initialize list and populate
+  populate_list();
+
+  // Validate prev pointer and data
+  node_t *curr = lst_->head->prev;
+  for (int i = 0; i < 5; i++) {
+    TEST_ASSERT_NOT_NULL(curr);
+    TEST_ASSERT_TRUE(*((int *)curr->data) == i);
+    curr = curr->prev;
+  }
+
+  // Destroy list
+  list_destroy(&lst_);
+  TEST_ASSERT_NULL(lst_);
+}
+
+// Test circular structure integrity by traversing forward and backward
+void test_circular_structure(void) {
+  // Initialize list and populate
+  populate_list();
+
+  // Verify circular structure by traversing forward
+  node_t *curr = lst_->head->next;
+  for (int i = 0; i < 5; i++) {
+      TEST_ASSERT_NOT_NULL(curr);
+      curr = curr->next;
+  }
+  TEST_ASSERT_EQUAL_PTR(lst_->head, curr);
+
+  // Verify circular structure by traversing backward
+  curr = lst_->head->prev;
+  for (int i = 0; i < 5; i++) {
+      TEST_ASSERT_NOT_NULL(curr);
+      curr = curr->prev;
+  }
+  TEST_ASSERT_EQUAL_PTR(lst_->head, curr);
+
+  // Destroy list
+  list_destroy(&lst_);
+  TEST_ASSERT_NULL(lst_);
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_create_destroy);
@@ -255,5 +350,12 @@ int main(void) {
   RUN_TEST(test_indexOf0);
   RUN_TEST(test_indexOf3);
   RUN_TEST(test_notInList);
+
+  // Additional Tests
+  RUN_TEST(test_list_size);
+  RUN_TEST(test_empty_list);
+  RUN_TEST(test_next_data);
+  RUN_TEST(test_prev_data);
+  RUN_TEST(test_circular_structure);
   return UNITY_END();
 }
