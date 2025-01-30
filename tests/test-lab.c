@@ -2,8 +2,11 @@
 #include "../src/lab.h"
 
 
-static list_t *lst_ = NULL;
+static list_t *lst_ = NULL; // The global list we are testing
 
+/**
+ * Helper function, allocates memory for an integer and set it to the value of i.
+ */
 static int *alloc_data(int i)
 {
   int *rval = (int *)malloc(sizeof(int));
@@ -11,11 +14,17 @@ static int *alloc_data(int i)
   return rval;
 }
 
+/**
+ * Helper function, frees the memory of the data.
+ */
 static void destroy_data(void *data)
 {
   free(data);
 }
 
+/**
+ * Helper function, compares two integers.
+ */
 static int compare_to(const void *a, const void *b)
 {
   int fst = *(int *)a;
@@ -23,6 +32,9 @@ static int compare_to(const void *a, const void *b)
   return fst - snd;
 }
 
+/**
+ * Helper function, populates the list with 5 elements.
+ */
 static void populate_list(void)
 {
   for (int i = 0; i < 5; i++)
@@ -31,16 +43,17 @@ static void populate_list(void)
     }
 }
 
-
+/** function needed by UNITY, runs before each test */
 void setUp(void) {
   lst_ = list_init(destroy_data, compare_to);
 }
 
+/** function needed by UNITY, runs after each test */
 void tearDown(void) {
   list_destroy(&lst_);
 }
 
-
+// Test list creation and destruction
 void test_create_destroy(void)
 {
   list_t *lst = NULL;
@@ -62,7 +75,7 @@ void test_create_destroy(void)
   TEST_ASSERT_TRUE(lst == NULL);
 }
 
-
+// Test adding one element to the list
 void test_add1(void)
 {
   list_add(lst_, alloc_data(1));
@@ -79,6 +92,7 @@ void test_add1(void)
   TEST_ASSERT_TRUE(*((int *)lst_->head->prev->data) == 1);
 }
 
+// Test adding two elements to the list
 void test_add2(void)
 {
   list_add(lst_, alloc_data(1));
@@ -98,11 +112,11 @@ void test_add2(void)
   TEST_ASSERT_TRUE(*((int *)lst_->head->prev->data) == 1);
 }
 
-
+// Test removing the first indexed element from the list
 void test_removeIndex0(void)
 {
-  populate_list();
-  int *rval = (int *)list_remove_index(lst_, 0);
+  populate_list(); // List should be 4->3->2->1->0
+  int *rval = (int *)list_remove_index(lst_, 0); // List should now be 3->2->1->0
   TEST_ASSERT_TRUE(lst_->size == 4);
   TEST_ASSERT_TRUE(*rval == 4);
   free(rval);
@@ -122,9 +136,10 @@ void test_removeIndex0(void)
     }
 }
 
+// Test removing the third indexed element from the list
 void test_removeIndex3(void)
 {
-  populate_list();
+  populate_list(); // List should be 4->3->2->1->0
   int *rval = (int *)list_remove_index(lst_, 3);
   TEST_ASSERT_TRUE(lst_->size == 4);
   TEST_ASSERT_TRUE(*rval == 1);
@@ -149,10 +164,10 @@ void test_removeIndex3(void)
     }
 }
 
-
+// Test removing the last indexed element from the list
 void test_removeIndex4(void)
 {
-  populate_list();
+  populate_list(); // List should be 4->3->2->1->0
   int *rval = (int *)list_remove_index(lst_, 4);
   TEST_ASSERT_TRUE(lst_->size == 4);
   TEST_ASSERT_TRUE(*rval == 0);
@@ -173,7 +188,7 @@ void test_removeIndex4(void)
     }
 }
 
-
+// Test the attempt to remove an element from an invalid index
 void test_invaidIndex(void)
 {
   populate_list();
@@ -196,6 +211,7 @@ void test_invaidIndex(void)
     }
 }
 
+// Test removing all elements from the list
 void test_removeAll(void)
 {
   populate_list();
@@ -214,6 +230,7 @@ void test_removeAll(void)
   TEST_ASSERT_TRUE(lst_->size == 0);
 }
 
+// Test
 void test_indexOf0(void)
 {
   populate_list();
@@ -294,6 +311,7 @@ void test_next_data(void) {
   TEST_ASSERT_NULL(lst_);
 }
 
+// Test prev pointer
 void test_prev_data(void) {
   // Initialize list and populate
   populate_list();
@@ -311,7 +329,7 @@ void test_prev_data(void) {
   TEST_ASSERT_NULL(lst_);
 }
 
-// Test circular structure integrity by traversing forward and backward
+// Test circular structure by traversing forward and backward
 void test_circular_structure(void) {
   // Initialize list and populate
   populate_list();
@@ -319,16 +337,16 @@ void test_circular_structure(void) {
   // Verify circular structure by traversing forward
   node_t *curr = lst_->head->next;
   for (int i = 0; i < 5; i++) {
-      TEST_ASSERT_NOT_NULL(curr);
-      curr = curr->next;
+    TEST_ASSERT_NOT_NULL(curr);
+    curr = curr->next;
   }
   TEST_ASSERT_EQUAL_PTR(lst_->head, curr);
 
   // Verify circular structure by traversing backward
   curr = lst_->head->prev;
   for (int i = 0; i < 5; i++) {
-      TEST_ASSERT_NOT_NULL(curr);
-      curr = curr->prev;
+    TEST_ASSERT_NOT_NULL(curr);
+    curr = curr->prev;
   }
   TEST_ASSERT_EQUAL_PTR(lst_->head, curr);
 
